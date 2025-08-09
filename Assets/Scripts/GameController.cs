@@ -1,11 +1,15 @@
 using System.Collections;
 using System;
 using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
     public static GameController instance;
     private Cinemachine.CinemachineVirtualCamera virtualCamera;
+    List<GameObject> codexPieces = new List<GameObject>();
+    int sceneToRespawn;
 
     void Awake()
     {
@@ -22,13 +26,7 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-        DontDestroyOnLoad(GameObject.FindWithTag("Player"));
         ChangeScene();
-    }
-
-    void Update()
-    {
-
     }
 
     public void ChangeScene()
@@ -41,5 +39,20 @@ public class GameController : MonoBehaviour
             virtualCamera.Follow = GameObject.FindWithTag("Player").transform;
         }
     }
+    public void AddCodexPiece(GameObject piece)
+    {
+        codexPieces.Add(piece);
+    }
 
+    public void UpdateLastCheckpoint()
+    {
+        sceneToRespawn = SceneManager.GetActiveScene().buildIndex;
+    }
+
+    public void RespawnPlayer()
+    {
+        SceneManager.LoadScene(sceneToRespawn);
+        GameObject.FindWithTag("Player").transform.position = GameObject.FindWithTag("Checkpoint").transform.position;
+        CharacterController.instance.ResetStates();
+    }
 }
