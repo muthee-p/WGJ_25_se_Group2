@@ -5,10 +5,24 @@ using UnityEngine.UI;
 
 public class HealthScript : MonoBehaviour
 {
+    public static HealthScript instance;
     [SerializeField] private Slider healthBar;
     public float maxHealth;
     float healthLoss = 10;
     float currentHealth;
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
