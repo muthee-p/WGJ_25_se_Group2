@@ -3,6 +3,7 @@ using UnityEngine;
 public class CharacterController : MonoBehaviour
 {
     public static CharacterController instance;
+    [SerializeField] GameObject playerWeapon;
     public float walkSpeed = 10.0f, runSpeed = 20.0f;
     private float speed;
     private Rigidbody2D rb;
@@ -38,9 +39,15 @@ public class CharacterController : MonoBehaviour
         Sober,
         Hallucinating
     }
+    public enum Attacking
+    {
+        Attacking,
+        NotAttacking
+    }
     public Movement movement = Movement.Walking;
     public Weapon weapon = Weapon.Unarmed;
     public Soberiety soberiety = Soberiety.Hallucinating;
+    public Attacking attacking = Attacking.NotAttacking;
 
     #endregion
     void Start()
@@ -67,6 +74,16 @@ public class CharacterController : MonoBehaviour
                 break;
         }
 
+        switch (weapon)
+        {
+            case Weapon.Armed:
+                playerWeapon.SetActive(true);
+                break;
+            case Weapon.Unarmed:
+                playerWeapon.SetActive(false);
+                break;
+        }
+
         //run
         if (Input.GetKey(KeyCode.LeftShift) && movement == Movement.Walking)
         {
@@ -75,6 +92,16 @@ public class CharacterController : MonoBehaviour
         else if (movement != Movement.Fainted)
         {
             movement = Movement.Walking;
+        }
+
+        //attack
+        if (Input.GetMouseButton(0) && movement != Movement.Fainted && weapon == Weapon.Armed)
+        {
+            attacking = Attacking.Attacking;
+        }
+        else
+        {
+            attacking = Attacking.NotAttacking;
         }
     }
 
@@ -94,6 +121,7 @@ public class CharacterController : MonoBehaviour
         movement = Movement.Walking;
         weapon = Weapon.Unarmed;
         soberiety = Soberiety.Hallucinating;
+        attacking = Attacking.NotAttacking;
     }
 
 }

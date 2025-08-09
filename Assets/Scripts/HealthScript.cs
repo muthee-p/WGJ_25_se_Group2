@@ -56,12 +56,7 @@ public class HealthScript : MonoBehaviour
 
             yield return new WaitForSeconds(0.2f);
         }
-
-        CharacterController.instance.Faint();
-        messageText.text = "You Fainted!";
-        messagePanel.SetActive(true);
-        restartButton.SetActive (true);
-
+        GameOver("You have Fainted!");
     }
 
     public void RefillHealth()
@@ -69,6 +64,7 @@ public class HealthScript : MonoBehaviour
         ChangeSpritesBack();
         currentHealth = maxHealth;
         healthBar.value = currentHealth;
+        messageShown = false;
 
         if (coroutineDrainHealth != null)
         {
@@ -108,6 +104,16 @@ public class HealthScript : MonoBehaviour
         yield return new WaitForSeconds(duration);
         messagePanel.SetActive(false);
     }
+
+    public void GameOver(string message)
+    {
+        StopCoroutine(coroutineDrainHealth);
+        CharacterController.instance.Faint();
+        messageText.text = message;
+        messagePanel.SetActive(true);
+        restartButton.SetActive(true);
+    }
+    
 
     public void RestartLevel()
     {

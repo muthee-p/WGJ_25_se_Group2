@@ -7,7 +7,8 @@ public class CollectableItem : MonoBehaviour
     private bool withinReach = false;
     private GameObject canvas;
 
-    void Start(){
+    void Start()
+    {
         canvas = transform.Find("Canvas").gameObject;
         canvas.SetActive(false);
     }
@@ -20,12 +21,13 @@ public class CollectableItem : MonoBehaviour
             canvas.SetActive(true);
             if (Input.GetKeyDown(KeyCode.E))
             {
-                Debug.Log("Player collected codex");
+                MatchCollectedItem();
+                Destroy(gameObject);
             }
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Player")
         {
@@ -33,7 +35,7 @@ public class CollectableItem : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    void OnTriggerExit2D(Collider2D collision)
     {
 
         if (collision.tag == "Player")
@@ -41,5 +43,19 @@ public class CollectableItem : MonoBehaviour
             withinReach = false;
             canvas.SetActive(false);
         }
+    }
+
+    void MatchCollectedItem()
+    {
+        switch (gameObject.tag)
+        {
+            case "Codex":
+                GameController.instance.ShowCodexPiece();
+                break;
+            case "Weapon":
+                CharacterController.instance.weapon = CharacterController.Weapon.Armed;
+                break;
+        }
+        
     }
 }

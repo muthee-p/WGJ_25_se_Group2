@@ -6,6 +6,9 @@ TagManager:
   tags:
   - VirtualCamera
   - Checkpoint
+  - Codex
+  - Weapon
+  - PlayerWeapon
   layers:
   - Default
   - TransparentFX

@@ -3,13 +3,14 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
     public static GameController instance;
+    [SerializeField] private List<Image> codexPieces = new List<Image>();
     private Cinemachine.CinemachineVirtualCamera virtualCamera;
-    List<GameObject> codexPieces = new List<GameObject>();
-    int sceneToRespawn;
+    int sceneToRespawn, codexPieceIndex = 0;
 
     void Awake()
     {
@@ -39,9 +40,16 @@ public class GameController : MonoBehaviour
             virtualCamera.Follow = GameObject.FindWithTag("Player").transform;
         }
     }
-    public void AddCodexPiece(GameObject piece)
+    public void ShowCodexPiece()
     {
-        codexPieces.Add(piece);
+        if (codexPieceIndex == codexPieces.Count-1)
+        {
+            return;
+        }
+        codexPieceIndex = codexPieceIndex + 1;
+        Color color = codexPieces[codexPieceIndex].color;
+        color.a = 1;
+        codexPieces[codexPieceIndex].color = color;
     }
 
     public void UpdateLastCheckpoint()
