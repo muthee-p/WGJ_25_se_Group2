@@ -3,11 +3,12 @@ using UnityEngine;
 public class CharacterController : MonoBehaviour
 {
     public static CharacterController instance;
-    [SerializeField] GameObject playerWeapon;
+    //[SerializeField] GameObject playerWeapon;
     public float walkSpeed = 10.0f, runSpeed = 20.0f;
     private float speed;
     private Rigidbody2D rb;
     private float moveInput;
+     private bool facingRight =true;
 
     void Awake()
     {
@@ -77,10 +78,10 @@ public class CharacterController : MonoBehaviour
         switch (weapon)
         {
             case Weapon.Armed:
-                playerWeapon.SetActive(true);
+                //playerWeapon.SetActive(true);
                 break;
             case Weapon.Unarmed:
-                playerWeapon.SetActive(false);
+                //playerWeapon.SetActive(false);
                 break;
         }
 
@@ -109,6 +110,22 @@ public class CharacterController : MonoBehaviour
     {
         if (movement == Movement.Fainted) return;
         rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
+         if (!facingRight && moveInput > 0)
+        {
+            Flip();
+        }
+        else if (facingRight && moveInput < 0)
+        {
+            Flip();
+        }
+    }
+
+    void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
     }
 
     public void Faint()
