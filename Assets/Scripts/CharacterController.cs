@@ -150,14 +150,16 @@ public class CharacterController : MonoBehaviour
     public void Faint()
     {
         movement = Movement.Fainted;
+        Vector3 theScale = transform.localScale;
+        theScale.z *= -1;
+        transform.localScale = theScale;
         //transform.localRotation = Quaternion.Euler(0, 0, -90);
     }
 
     public void ResetStates()
     {
-        movement = Movement.Walking;
-        weapon = Weapon.Unarmed;
-        gameState = GameState.Paused;
+        movement = Movement.Idle;
+        gameState = GameState.Playing;
         attacking = Attacking.NotAttacking;
     }
 
@@ -168,7 +170,7 @@ public class CharacterController : MonoBehaviour
 
     private System.Collections.IEnumerator AttackRoutine()
     {
-        AudioSource.PlayClipAtPoint(attackSound, transform.position);
+        AudioSource.PlayClipAtPoint(attackSound, transform.position, 0.5f);
         weaponHitbox.SetActive(true);
         yield return new WaitForSeconds(0.2f);
         weaponHitbox.SetActive(false);

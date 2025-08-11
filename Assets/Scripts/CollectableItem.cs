@@ -9,10 +9,12 @@ public class CollectableItem : MonoBehaviour
     public string codexText, researchLogText;
     private bool withinReach = false;
     private GameObject canvas;
+    Vector3 originalScale;
 
     void Start()
     {
         canvas = transform.Find("Canvas").gameObject;
+        originalScale = canvas.transform.localScale; 
         canvas.SetActive(false);
     }
 
@@ -22,7 +24,7 @@ public class CollectableItem : MonoBehaviour
         if (withinReach)
         {
             canvas.SetActive(true);
-            Vector3 originalScale = canvas.transform.localScale; 
+            
             canvas.transform.localScale = Vector3.zero;
             canvas.transform.DOScale(originalScale, 0.4f).SetEase(Ease.OutBack);
 

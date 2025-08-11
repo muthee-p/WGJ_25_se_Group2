@@ -10,11 +10,13 @@ public class HealthScript : MonoBehaviour
     [SerializeField] private Slider healthBar;
     [SerializeField] private GameObject messagePanel, restartButton;
     [SerializeField] private TextMeshProUGUI messageText;
-    public float maxHealth;
+    [SerializeField] private AudioClip healthLowWarning, faintingSound;
+    public float maxHealth, lowHealthThreshold;
     float healthLoss = 10;
     float currentHealth;
     bool messageShown = false;
     Coroutine coroutineDrainHealth;
+    AudioSource audioSource;
 
     void Awake()
     {
@@ -37,6 +39,7 @@ public class HealthScript : MonoBehaviour
         healthBar.value = currentHealth;
 
         coroutineDrainHealth = StartCoroutine(DrainHealth());
+        audioSource = GetComponent<AudioSource>();
     }
 
     IEnumerator DrainHealth()
@@ -48,11 +51,17 @@ public class HealthScript : MonoBehaviour
 
             healthBar.value = currentHealth;
 
-            if (currentHealth < 250 && !messageShown)
+            if (currentHealth < lowHealthThreshold && !messageShown)
             {
                 messageShown = true;
                 ChangeSprites();
+
+                audioSource.clip = healthLowWarning;
+                if (!audioSource.isPlaying) audioSource.Play();
                 yield return StartCoroutine(ShowMessage("You are getting low on health!", 3f));
+
+                if (audioSource.isPlaying) audioSource.Stop();
+                audioSource.clip = null;
             }
 
             yield return new WaitForSeconds(0.2f);
@@ -117,6 +126,10 @@ public class HealthScript : MonoBehaviour
     {
         StopCoroutine(coroutineDrainHealth);
         CharacterController.instance.Faint();
+
+        audioSource.clip = faintingSound;
+        if (!audioSource.isPlaying) audioSource.Play();
+
         messageText.text = message;
         messagePanel.SetActive(true);
         messagePanel.transform.DOScale(1, 0.4f).SetEase(Ease.OutBack);
@@ -134,6 +147,9 @@ public class HealthScript : MonoBehaviour
 
     public void RestartLevel()
     {
+        if (audioSource.isPlaying) audioSource.Stop();
+        audioSource.clip = null;
+
         GameController.instance.RespawnPlayer();
         restartButton.SetActive(false);
         messagePanel.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
