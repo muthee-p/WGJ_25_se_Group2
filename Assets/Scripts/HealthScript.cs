@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -118,7 +119,9 @@ public class HealthScript : MonoBehaviour
         CharacterController.instance.Faint();
         messageText.text = message;
         messagePanel.SetActive(true);
+        messagePanel.transform.DOScale(1, 0.4f).SetEase(Ease.OutBack);
         restartButton.SetActive(true);
+
     }
      public void YouWon(string message)
     {
@@ -133,8 +136,8 @@ public class HealthScript : MonoBehaviour
     {
         GameController.instance.RespawnPlayer();
         restartButton.SetActive(false);
-        messagePanel.SetActive(false);
-
+        messagePanel.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
+        .OnComplete(() => messagePanel.gameObject.SetActive(false));
     }
 
 }

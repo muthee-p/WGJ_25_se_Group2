@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 
 public class GameController : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI codexText, researchLogText;
     public List<GameObject> deadEnemies = new List<GameObject>();
     public List<GameObject> foundCodexPieces = new List<GameObject>();
+    public bool enemyTutotialShown = false;
     private Cinemachine.CinemachineVirtualCamera virtualCamera;
     int sceneToRespawn, codexPieceIndex = 0;
     bool allCodexPiecesCollected = false;
@@ -46,6 +48,17 @@ public class GameController : MonoBehaviour
             virtualCamera.Follow = GameObject.FindWithTag("Player").transform;
         }
         GameObject.FindWithTag("Player").transform.position = GameObject.FindWithTag("PlayerSpawnPoint").transform.position;
+        
+        if (enemyTutotialShown) DestroyTutorial();
+    }
+
+    public void DestroyTutorial()
+    {
+        GameObject enemyTutotial = GameObject.Find("EnemyTutorial");
+        if (enemyTutotial != null)
+        {
+            Destroy(enemyTutotial);
+        }
     }
 
     #region Codex
@@ -57,7 +70,12 @@ public class GameController : MonoBehaviour
             return;
         }
         CharacterController.instance.Pause();
+
         codexPanel.SetActive(true);
+        Vector3 originalScale = codexPanel.transform.localScale; 
+        codexPanel.transform.localScale = Vector3.zero;
+        codexPanel.transform.DOScale(originalScale, 0.4f).SetEase(Ease.OutBack);
+
         codexText.text = text;
         researchLogText.text = researchText;
         codexPieceIndex = codexPieceIndex + 1;
@@ -123,13 +141,17 @@ public class GameController : MonoBehaviour
 
     public void CancleButton()
     {
-        codexPanel.SetActive(false);
+        codexPanel.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
+        .OnComplete(() => codexPanel.gameObject.SetActive(false));
+
         CharacterController.instance.Unpause();
     }
 
     public void StartGame()
     {
-        startScreen.SetActive(false);
+        startScreen.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
+        .OnComplete(() => startScreen.gameObject.SetActive(false));
+       
         CharacterController.instance.Unpause();
     }
 

@@ -11,21 +11,14 @@ public class EnemyController : MonoBehaviour
     public Vector3 initialPos;
     public bool isAttacking = false;
     private Transform player;
-    private GameObject canvas;
-    bool canvasShown = false;
-    bool audioPlayed = false;
     int maxHealth = 30;
-    AudioSource audioSource;
     Animator anim;
 
     void Start()
     {
-        audioSource = GetComponent<AudioSource>();
         anim = GetComponent<Animator>();
         initialPos = transform.position;
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        canvas = transform.Find("Canvas").gameObject;
-        canvas.SetActive(false);
     }
 
     // Update is called once per frame
@@ -36,33 +29,16 @@ public class EnemyController : MonoBehaviour
         {
             anim.SetFloat("speed", 0.5f);
             transform.position = new Vector3(Mathf.MoveTowards(transform.position.x, player.position.x, speed * Time.deltaTime), transform.position.y, transform.position.z);
-
-            if (!audioPlayed)
-            {
-                audioSource.clip = enemyInSight;
-                audioSource.Play();
-                audioPlayed = true;
-            }
-
-            if (!canvasShown)
-            {
-                canvasShown = true;
-                canvas.SetActive(true);
-            }
         }
         else if (distanceFromPlayer < attackZone && !isAttacking)
         {
             isAttacking = true;
-            canvas.SetActive(false);
             StartCoroutine(AttackRoutine());
         }
         else
         {
             transform.position = new Vector3(Mathf.MoveTowards(transform.position.x, initialPos.x, speed * Time.deltaTime), transform.position.y, transform.position.z);
             isAttacking = false;
-            audioPlayed = false;
-            audioSource.Stop();
-            audioSource.clip = null;
         }
 
         if (player.position.x > transform.position.x)
@@ -79,14 +55,6 @@ public class EnemyController : MonoBehaviour
             anim.SetFloat("speed", 0);
         }
 
-    }
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        // if (collision.gameObject.CompareTag("Player"))
-        // {
-        //     caught = true;
-        //     HealthScript.instance.GameOver("You have been caught!");
-        // }
     }
 
     public void TakeDamage(int damage)
@@ -111,7 +79,5 @@ public class EnemyController : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, lineOfSight);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackZone);
-    }
-    
-
+    } 
 }

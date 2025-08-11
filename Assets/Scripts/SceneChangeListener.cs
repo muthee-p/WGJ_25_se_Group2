@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SceneChangeListener : MonoBehaviour
 {
-    
+
     void Start()
     {
         GameController.instance.ChangeScene();

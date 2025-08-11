@@ -95,7 +95,6 @@ public class CharacterController : MonoBehaviour
                 break;
             case Movement.Walking:
                 speed = walkSpeed;
-                audioSource.Play();
                 break;
             case Movement.Running:
                 speed = runSpeed;
@@ -115,7 +114,7 @@ public class CharacterController : MonoBehaviour
         }
 
         //attack
-        if (Input.GetMouseButton(0) && movement != Movement.Fainted && weapon == Weapon.Armed)
+        if (Input.GetMouseButton(0) && movement != Movement.Fainted && weapon == Weapon.Armed && gameState == GameState.Playing)
         {
             attacking = Attacking.Attacking;
             Attack();
@@ -151,7 +150,7 @@ public class CharacterController : MonoBehaviour
     public void Faint()
     {
         movement = Movement.Fainted;
-        transform.localRotation = Quaternion.Euler(0, 0, -90);
+        //transform.localRotation = Quaternion.Euler(0, 0, -90);
     }
 
     public void ResetStates()
@@ -164,7 +163,6 @@ public class CharacterController : MonoBehaviour
 
     void Attack()
     {
-
         StartCoroutine(AttackRoutine());
     }
 

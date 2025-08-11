@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class CollectableItem : MonoBehaviour
@@ -21,6 +22,10 @@ public class CollectableItem : MonoBehaviour
         if (withinReach)
         {
             canvas.SetActive(true);
+            Vector3 originalScale = canvas.transform.localScale; 
+            canvas.transform.localScale = Vector3.zero;
+            canvas.transform.DOScale(originalScale, 0.4f).SetEase(Ease.OutBack);
+
             if (Input.GetKeyDown(KeyCode.E))
             {
                 AudioSource.PlayClipAtPoint(collectedSound, transform.position);
@@ -44,7 +49,8 @@ public class CollectableItem : MonoBehaviour
         if (collision.tag == "Player")
         {
             withinReach = false;
-            canvas.SetActive(false);
+            canvas.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
+            .OnComplete(() => canvas.gameObject.SetActive(false));
         }
     }
 
