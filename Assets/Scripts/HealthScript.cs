@@ -51,12 +51,19 @@ public class HealthScript : MonoBehaviour
             {
                 messageShown = true;
                 ChangeSprites();
-                yield return StartCoroutine(ShowMessage("You are getting low on health!", 2f));
+                yield return StartCoroutine(ShowMessage("You are getting low on health!", 3f));
             }
 
             yield return new WaitForSeconds(0.2f);
         }
         GameOver("You have Fainted!");
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        healthBar.value = currentHealth;
     }
 
     public void RefillHealth()
@@ -112,6 +119,13 @@ public class HealthScript : MonoBehaviour
         messageText.text = message;
         messagePanel.SetActive(true);
         restartButton.SetActive(true);
+    }
+     public void YouWon(string message)
+    {
+        StopCoroutine(coroutineDrainHealth);
+        CharacterController.instance.Faint();
+        messageText.text = message;
+        messagePanel.SetActive(true);
     }
     
 

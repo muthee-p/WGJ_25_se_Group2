@@ -9,6 +9,8 @@ TagManager:
   - Codex
   - Weapon
   - PlayerWeapon
+  - Enemy
+  - PlayerSpawnPoint
   layers:
   - Default
   - TransparentFX

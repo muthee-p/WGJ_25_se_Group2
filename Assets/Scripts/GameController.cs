@@ -4,13 +4,19 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class GameController : MonoBehaviour
 {
     public static GameController instance;
     [SerializeField] private List<Image> codexPieces = new List<Image>();
+    [SerializeField] private GameObject cancleButton, codexPanel, startScreen;
+    [SerializeField] private TextMeshProUGUI codexText, researchLogText;
+    public List<GameObject> deadEnemies = new List<GameObject>();
+    public List<GameObject> foundCodexPieces = new List<GameObject>();
     private Cinemachine.CinemachineVirtualCamera virtualCamera;
     int sceneToRespawn, codexPieceIndex = 0;
+    bool allCodexPiecesCollected = false;
 
     void Awake()
     {
@@ -39,18 +45,44 @@ public class GameController : MonoBehaviour
             virtualCamera.LookAt = GameObject.FindWithTag("Player").transform;
             virtualCamera.Follow = GameObject.FindWithTag("Player").transform;
         }
+        GameObject.FindWithTag("Player").transform.position = GameObject.FindWithTag("PlayerSpawnPoint").transform.position;
     }
-    public void ShowCodexPiece()
+
+    #region Codex
+    public void ShowCodexPiece(string text, string researchText)
     {
-        if (codexPieceIndex == codexPieces.Count-1)
+        if (codexPieceIndex == codexPieces.Count - 1)
         {
+            allCodexPiecesCollected = true;
             return;
         }
+        CharacterController.instance.Pause();
+        codexPanel.SetActive(true);
+        codexText.text = text;
+        researchLogText.text = researchText;
         codexPieceIndex = codexPieceIndex + 1;
         Color color = codexPieces[codexPieceIndex].color;
         color.a = 1;
         codexPieces[codexPieceIndex].color = color;
+
     }
+
+    public void AddCodexPiece(GameObject codexPiece)
+    {
+        foundCodexPieces.Add(codexPiece);
+    }
+
+    public void DestroyFoundCodexPiece(GameObject codexPiece)
+    {
+        for (int i = 0; i < foundCodexPieces.Count; i++)
+        {
+            if (foundCodexPieces[i] == codexPiece)
+            {
+                Destroy(foundCodexPieces[i]);
+            }
+        }
+    }
+    #endregion
 
     public void UpdateLastCheckpoint()
     {
@@ -63,4 +95,48 @@ public class GameController : MonoBehaviour
         GameObject.FindWithTag("Player").transform.position = GameObject.FindWithTag("Checkpoint").transform.position;
         CharacterController.instance.ResetStates();
     }
+
+    public void AddDeadEnemy(GameObject enemy)
+    {
+        deadEnemies.Add(enemy);
+    }
+
+    public void DestroyDeadEnemies()
+    {
+        for (int i = deadEnemies.Count - 1; i >= 0; i--)
+        {
+            if (deadEnemies[i] == null)
+            {
+                deadEnemies.RemoveAt(i);
+            }
+        }
+    }
+
+    public void IsGameWon()
+    {
+        if (allCodexPiecesCollected)
+        {
+            HealthScript.instance.YouWon("You have won!");
+        }
+    }
+    #region UIButtons
+
+    public void CancleButton()
+    {
+        codexPanel.SetActive(false);
+        CharacterController.instance.Unpause();
+    }
+
+    public void StartGame()
+    {
+        startScreen.SetActive(false);
+        CharacterController.instance.Unpause();
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    #endregion
 }

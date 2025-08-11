@@ -3,12 +3,15 @@ using UnityEngine;
 public class CharacterController : MonoBehaviour
 {
     public static CharacterController instance;
-    //[SerializeField] GameObject playerWeapon;
+    [SerializeField] GameObject weaponHitbox;
+    [SerializeField] AudioClip attackSound;
     public float walkSpeed = 10.0f, runSpeed = 20.0f;
     private float speed;
     private Rigidbody2D rb;
     private float moveInput;
-     private bool facingRight =true;
+    private bool facingRight = true;
+    Animator anim;
+    AudioSource audioSource;
 
     void Awake()
     {
@@ -26,6 +29,7 @@ public class CharacterController : MonoBehaviour
     #region States
     public enum Movement
     {
+        Idle,
         Walking,
         Running,
         Fainted
@@ -35,19 +39,19 @@ public class CharacterController : MonoBehaviour
         Armed,
         Unarmed
     }
-    public enum Soberiety
+    public enum GameState
     {
-        Sober,
-        Hallucinating
+        Playing,
+        Paused
     }
     public enum Attacking
     {
         Attacking,
         NotAttacking
     }
-    public Movement movement = Movement.Walking;
-    public Weapon weapon = Weapon.Unarmed;
-    public Soberiety soberiety = Soberiety.Hallucinating;
+    public Movement movement = Movement.Idle;
+    public Weapon weapon = Weapon.Armed;
+    public GameState gameState = GameState.Paused;
     public Attacking attacking = Attacking.NotAttacking;
 
     #endregion
@@ -55,21 +59,46 @@ public class CharacterController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         speed = walkSpeed;
+        weaponHitbox.SetActive(false);
+        weaponHitbox.GetComponent<WeaponHitbox>().owner = this;
+        anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
-        if (movement == Movement.Fainted) return;
+        moveInput = Input.GetAxis("Horizontal");
+
+        if (movement != Movement.Fainted && gameState == GameState.Playing)
+        {
+            if (Mathf.Abs(moveInput) > 0.01f)
+            {
+                anim.SetFloat("speed", 0.5f);
+                if (!audioSource.isPlaying) audioSource.Play();
+                if (Input.GetKey(KeyCode.LeftShift))
+                    movement = Movement.Running;
+                else
+                    movement = Movement.Walking;
+            }
+            else
+            {
+                anim.SetFloat("speed", 0);
+                movement = Movement.Idle;
+                if (audioSource.isPlaying) audioSource.Stop();
+            }
+        }
 
         switch (movement)
         {
+            case Movement.Idle:
+                speed = 0;
+                break;
             case Movement.Walking:
                 speed = walkSpeed;
-                moveInput = Input.GetAxis("Horizontal");
+                audioSource.Play();
                 break;
             case Movement.Running:
                 speed = runSpeed;
-                moveInput = Input.GetAxis("Horizontal");
                 break;
             case Movement.Fainted:
                 break;
@@ -78,27 +107,18 @@ public class CharacterController : MonoBehaviour
         switch (weapon)
         {
             case Weapon.Armed:
-                //playerWeapon.SetActive(true);
+                weaponHitbox.SetActive(true);
                 break;
             case Weapon.Unarmed:
-                //playerWeapon.SetActive(false);
+                weaponHitbox.SetActive(false);
                 break;
-        }
-
-        //run
-        if (Input.GetKey(KeyCode.LeftShift) && movement == Movement.Walking)
-        {
-            movement = Movement.Running;
-        }
-        else if (movement != Movement.Fainted)
-        {
-            movement = Movement.Walking;
         }
 
         //attack
         if (Input.GetMouseButton(0) && movement != Movement.Fainted && weapon == Weapon.Armed)
         {
             attacking = Attacking.Attacking;
+            Attack();
         }
         else
         {
@@ -110,11 +130,11 @@ public class CharacterController : MonoBehaviour
     {
         if (movement == Movement.Fainted) return;
         rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
-         if (!facingRight && moveInput > 0)
+        if (facingRight && moveInput > 0)
         {
             Flip();
         }
-        else if (facingRight && moveInput < 0)
+        else if (!facingRight && moveInput < 0)
         {
             Flip();
         }
@@ -131,14 +151,39 @@ public class CharacterController : MonoBehaviour
     public void Faint()
     {
         movement = Movement.Fainted;
+        transform.localRotation = Quaternion.Euler(0, 0, -90);
     }
 
     public void ResetStates()
     {
         movement = Movement.Walking;
         weapon = Weapon.Unarmed;
-        soberiety = Soberiety.Hallucinating;
+        gameState = GameState.Paused;
         attacking = Attacking.NotAttacking;
+    }
+
+    void Attack()
+    {
+
+        StartCoroutine(AttackRoutine());
+    }
+
+    private System.Collections.IEnumerator AttackRoutine()
+    {
+        AudioSource.PlayClipAtPoint(attackSound, transform.position);
+        weaponHitbox.SetActive(true);
+        yield return new WaitForSeconds(0.2f);
+        weaponHitbox.SetActive(false);
+    }
+
+    public void Unpause()
+    {
+        gameState = GameState.Playing;
+    }
+    
+    public void Pause()
+    {
+        gameState = GameState.Paused;
     }
 
 }

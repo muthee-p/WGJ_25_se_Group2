@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CollectableItem : MonoBehaviour
 {
+    [SerializeField] private AudioClip collectedSound;
+    public string codexText, researchLogText;
     private bool withinReach = false;
     private GameObject canvas;
 
@@ -21,6 +23,7 @@ public class CollectableItem : MonoBehaviour
             canvas.SetActive(true);
             if (Input.GetKeyDown(KeyCode.E))
             {
+                AudioSource.PlayClipAtPoint(collectedSound, transform.position);
                 MatchCollectedItem();
                 Destroy(gameObject);
             }
@@ -50,7 +53,7 @@ public class CollectableItem : MonoBehaviour
         switch (gameObject.tag)
         {
             case "Codex":
-                GameController.instance.ShowCodexPiece();
+                GameController.instance.ShowCodexPiece(codexText, researchLogText);
                 break;
             case "Weapon":
                 CharacterController.instance.weapon = CharacterController.Weapon.Armed;

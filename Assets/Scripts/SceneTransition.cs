@@ -11,6 +11,11 @@ public class SceneTransition : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E) && canChangeScene)
         {
             EnterLevel();
+            
+            if (gameObject.name == "Exit")
+            {
+                GameController.instance.IsGameWon();
+            }
         }
     }
 
