@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class CharacterController : MonoBehaviour
@@ -10,6 +11,7 @@ public class CharacterController : MonoBehaviour
     private Rigidbody2D rb;
     private float moveInput;
     private bool facingRight = true;
+    bool isAttacking = false;
     Animator anim;
     AudioSource audioSource;
 
@@ -49,6 +51,7 @@ public class CharacterController : MonoBehaviour
         Attacking,
         NotAttacking
     }
+
     public Movement movement = Movement.Idle;
     public Weapon weapon = Weapon.Armed;
     public GameState gameState = GameState.Paused;
@@ -64,7 +67,7 @@ public class CharacterController : MonoBehaviour
         anim = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
     }
-
+    #region Movement
     void Update()
     {
         moveInput = Input.GetAxis("Horizontal");
@@ -100,6 +103,7 @@ public class CharacterController : MonoBehaviour
                 speed = runSpeed;
                 break;
             case Movement.Fainted:
+                Faint();
                 break;
         }
 
@@ -150,30 +154,28 @@ public class CharacterController : MonoBehaviour
     public void Faint()
     {
         movement = Movement.Fainted;
-        Vector3 theScale = transform.localScale;
-        theScale.z *= -1;
-        transform.localScale = theScale;
-        //transform.localRotation = Quaternion.Euler(0, 0, -90);
-    }
+        speed = 0;
+        anim.SetFloat("speed", 0);
+        transform.DORotate(
+            new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 90f),
+            1f,
+        RotateMode.Fast
+        );
 
+    }
+    #endregion
+    #region States Cont'd
     public void ResetStates()
     {
+        transform.DORotate(
+            new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 0f),
+            1f,
+        RotateMode.Fast
+        );
+
         movement = Movement.Idle;
         gameState = GameState.Playing;
         attacking = Attacking.NotAttacking;
-    }
-
-    void Attack()
-    {
-        StartCoroutine(AttackRoutine());
-    }
-
-    private System.Collections.IEnumerator AttackRoutine()
-    {
-        AudioSource.PlayClipAtPoint(attackSound, transform.position, 0.5f);
-        weaponHitbox.SetActive(true);
-        yield return new WaitForSeconds(0.2f);
-        weaponHitbox.SetActive(false);
     }
 
     public void Unpause()
@@ -185,5 +187,25 @@ public class CharacterController : MonoBehaviour
     {
         gameState = GameState.Paused;
     }
+    #endregion
+
+    #region Combat
+    void Attack()
+    {
+        StartCoroutine(AttackRoutine());
+    }
+
+    private System.Collections.IEnumerator AttackRoutine()
+    {
+        if (isAttacking) yield break;
+
+        isAttacking = true;
+        AudioSource.PlayClipAtPoint(attackSound, transform.position, 0.5f);
+        weaponHitbox.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        weaponHitbox.SetActive(false);
+        isAttacking = false;
+    }
+    #endregion
 
 }

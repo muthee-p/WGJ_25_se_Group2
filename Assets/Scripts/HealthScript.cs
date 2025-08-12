@@ -17,6 +17,7 @@ public class HealthScript : MonoBehaviour
     bool messageShown = false;
     Coroutine coroutineDrainHealth;
     AudioSource audioSource;
+    Vector3 messagePanelScale;
 
     void Awake()
     {
@@ -37,8 +38,8 @@ public class HealthScript : MonoBehaviour
         currentHealth = maxHealth;
         healthBar.maxValue = maxHealth;
         healthBar.value = currentHealth;
+        messagePanelScale = messagePanel.transform.localScale;
 
-        coroutineDrainHealth = StartCoroutine(DrainHealth());
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -51,22 +52,30 @@ public class HealthScript : MonoBehaviour
 
             healthBar.value = currentHealth;
 
-            if (currentHealth < lowHealthThreshold && !messageShown)
+            if (currentHealth <= lowHealthThreshold && !messageShown
+                && CharacterCheckAttack.instance.beingAttacked == CharacterCheckAttack.BeingAttacked.NotBeingAttacked)
             {
                 messageShown = true;
                 ChangeSprites();
 
                 audioSource.clip = healthLowWarning;
                 if (!audioSource.isPlaying) audioSource.Play();
-                yield return StartCoroutine(ShowMessage("You are getting low on health!", 3f));
-
-                if (audioSource.isPlaying) audioSource.Stop();
-                audioSource.clip = null;
+                yield return StartCoroutine(ShowMessage("You are getting low on health!", 4f));
             }
 
             yield return new WaitForSeconds(0.2f);
         }
-        GameOver("You have Fainted!");
+        Debug.Log(CharacterCheckAttack.instance.beingAttacked);
+        if (CharacterCheckAttack.instance.beingAttacked == CharacterCheckAttack.BeingAttacked.NotBeingAttacked)
+        {
+
+            GameOver("You have Fainted!");
+        }
+        else
+        {
+            GameOver("You have been Captured!");
+            CharacterCheckAttack.instance.beingAttacked = CharacterCheckAttack.BeingAttacked.Captured;
+        }
     }
 
     public void TakeDamage(float damage)
@@ -78,6 +87,9 @@ public class HealthScript : MonoBehaviour
 
     public void RefillHealth()
     {
+        if (audioSource.isPlaying) audioSource.Stop();
+        audioSource.clip = null;
+
         ChangeSpritesBack();
         currentHealth = maxHealth;
         healthBar.value = currentHealth;
@@ -118,32 +130,43 @@ public class HealthScript : MonoBehaviour
     {
         messageText.text = message;
         messagePanel.SetActive(true);
+        messagePanel.transform.localScale = Vector3.zero;
+        messagePanel.transform.DOScale(messagePanelScale, 0.4f).SetEase(Ease.OutBack);
+
         yield return new WaitForSeconds(duration);
         messagePanel.SetActive(false);
     }
 
+    #region Game States
     public void GameOver(string message)
     {
         StopCoroutine(coroutineDrainHealth);
         CharacterController.instance.Faint();
 
         audioSource.clip = faintingSound;
+        audioSource.loop = false;
+        audioSource.volume = 0.5f;
         if (!audioSource.isPlaying) audioSource.Play();
 
         messageText.text = message;
+
         messagePanel.SetActive(true);
-        messagePanel.transform.DOScale(1, 0.4f).SetEase(Ease.OutBack);
+        messagePanel.transform.localScale = Vector3.zero;
+        messagePanel.transform.DOScale(messagePanelScale, 0.4f).SetEase(Ease.OutBack);
+
         restartButton.SetActive(true);
 
     }
-     public void YouWon(string message)
+    public void YouWon(string message)
     {
         StopCoroutine(coroutineDrainHealth);
         CharacterController.instance.Faint();
         messageText.text = message;
         messagePanel.SetActive(true);
+        messagePanel.transform.localScale = Vector3.zero;
+        messagePanel.transform.DOScale(messagePanelScale, 0.4f).SetEase(Ease.OutBack);
     }
-    
+
 
     public void RestartLevel()
     {
@@ -151,9 +174,14 @@ public class HealthScript : MonoBehaviour
         audioSource.clip = null;
 
         GameController.instance.RespawnPlayer();
+        CharacterCheckAttack.instance.beingAttacked = CharacterCheckAttack.BeingAttacked.NotBeingAttacked;
+        currentHealth = maxHealth;
+        RestartRoutineDrainHealth();
         restartButton.SetActive(false);
         messagePanel.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
         .OnComplete(() => messagePanel.gameObject.SetActive(false));
     }
+    
+    #endregion
 
 }

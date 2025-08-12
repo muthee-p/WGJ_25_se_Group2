@@ -11,6 +11,7 @@ TagManager:
   - PlayerWeapon
   - Enemy
   - PlayerSpawnPoint
+  - EnemyWeapon
   layers:
   - Default
   - TransparentFX

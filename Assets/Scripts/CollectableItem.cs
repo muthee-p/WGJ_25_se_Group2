@@ -6,7 +6,7 @@ using UnityEngine;
 public class CollectableItem : MonoBehaviour
 {
     [SerializeField] private AudioClip collectedSound;
-    public string codexText, researchLogText;
+    public string codexText, researchLogText, uniqueId;
     private bool withinReach = false;
     private GameObject canvas;
     Vector3 originalScale;
@@ -14,8 +14,13 @@ public class CollectableItem : MonoBehaviour
     void Start()
     {
         canvas = transform.Find("Canvas").gameObject;
-        originalScale = canvas.transform.localScale; 
+        originalScale = canvas.transform.localScale;
         canvas.SetActive(false);
+        
+        if(GameController.instance.foundCodexPieces.Contains(uniqueId))
+        {
+            Destroy(gameObject);
+        }
     }
 
     // Update is called once per frame
@@ -23,15 +28,11 @@ public class CollectableItem : MonoBehaviour
     {
         if (withinReach)
         {
-            canvas.SetActive(true);
-            
-            canvas.transform.localScale = Vector3.zero;
-            canvas.transform.DOScale(originalScale, 0.4f).SetEase(Ease.OutBack);
-
             if (Input.GetKeyDown(KeyCode.E))
             {
                 AudioSource.PlayClipAtPoint(collectedSound, transform.position);
                 MatchCollectedItem();
+                GameController.instance.foundCodexPieces.Add(uniqueId);
                 Destroy(gameObject);
             }
         }
@@ -42,6 +43,9 @@ public class CollectableItem : MonoBehaviour
         if (collision.tag == "Player")
         {
             withinReach = true;
+            canvas.SetActive(true);
+            canvas.transform.localScale = Vector3.zero;
+            canvas.transform.DOScale(originalScale, 0.4f).SetEase(Ease.OutBack);
         }
     }
 

@@ -220,8 +220,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4626680988228441140}
   - component: {fileID: 9000892118867471303}
-  - component: {fileID: 1496596181226309012}
   - component: {fileID: 1897998398643613858}
+  - component: {fileID: 7885771312840200122}
   m_Layer: 0
   m_Name: Collectable
   m_TagString: Codex
@@ -297,8 +297,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &1496596181226309012
-CircleCollider2D:
+--- !u!114 &1897998398643613858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8831489882010721606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae622ac0c8f0a604da8408bb24bc4183, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collectedSound: {fileID: 8300000, guid: 6363564dd3712e6478ba8cdd09891100, type: 3}
+  codexText: ..
+  researchLogText: .
+--- !u!61 &7885771312840200122
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -329,24 +344,19 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.92}
+  m_Offset: {x: 0.05311203, y: 0.7272513}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.28866667}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
   serializedVersion: 2
-  m_Radius: 3.6
---- !u!114 &1897998398643613858
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8831489882010721606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae622ac0c8f0a604da8408bb24bc4183, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collectedSound: {fileID: 8300000, guid: 6363564dd3712e6478ba8cdd09891100, type: 3}
-  codexText: ..
-  researchLogText: 
+  m_Size: {x: 6.4778214, y: 2.1532283}
+  m_EdgeRadius: 0
 --- !u!1 &8956575099283292257
 GameObject:
   m_ObjectHideFlags: 0

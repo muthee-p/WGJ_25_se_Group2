@@ -14,11 +14,13 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject cancleButton, codexPanel, startScreen;
     [SerializeField] private TextMeshProUGUI codexText, researchLogText;
     public List<GameObject> deadEnemies = new List<GameObject>();
-    public List<GameObject> foundCodexPieces = new List<GameObject>();
+    public HashSet<String> foundCodexPieces = new HashSet<String>();
+    public HashSet<String> killedEnemies = new HashSet<String>();
     public bool enemyTutotialShown = false;
     private Cinemachine.CinemachineVirtualCamera virtualCamera;
     int sceneToRespawn, codexPieceIndex = 0;
     bool allCodexPiecesCollected = false;
+    Vector3 codexPanelScale;
 
     void Awake()
     {
@@ -36,6 +38,7 @@ public class GameController : MonoBehaviour
     void Start()
     {
         ChangeScene();
+        codexPanelScale = codexPanel.transform.localScale;
     }
 
     public void ChangeScene()
@@ -48,7 +51,7 @@ public class GameController : MonoBehaviour
             virtualCamera.Follow = GameObject.FindWithTag("Player").transform;
         }
         GameObject.FindWithTag("Player").transform.position = GameObject.FindWithTag("PlayerSpawnPoint").transform.position;
-        
+
         if (enemyTutotialShown) DestroyTutorial();
     }
 
@@ -64,7 +67,7 @@ public class GameController : MonoBehaviour
     #region Codex
     public void ShowCodexPiece(string text, string researchText)
     {
-        if (codexPieceIndex == codexPieces.Count - 1)
+        if (codexPieceIndex == codexPieces.Count)
         {
             allCodexPiecesCollected = true;
             return;
@@ -72,34 +75,17 @@ public class GameController : MonoBehaviour
         CharacterController.instance.Pause();
 
         codexPanel.SetActive(true);
-        Vector3 originalScale = codexPanel.transform.localScale; 
         codexPanel.transform.localScale = Vector3.zero;
-        codexPanel.transform.DOScale(originalScale, 0.4f).SetEase(Ease.OutBack);
+        codexPanel.transform.DOScale(codexPanelScale, 0.4f).SetEase(Ease.OutBack);
 
         codexText.text = text;
         researchLogText.text = researchText;
-        codexPieceIndex = codexPieceIndex + 1;
         Color color = codexPieces[codexPieceIndex].color;
         color.a = 1;
         codexPieces[codexPieceIndex].color = color;
-
+        codexPieceIndex = codexPieceIndex + 1;
     }
 
-    public void AddCodexPiece(GameObject codexPiece)
-    {
-        foundCodexPieces.Add(codexPiece);
-    }
-
-    public void DestroyFoundCodexPiece(GameObject codexPiece)
-    {
-        for (int i = 0; i < foundCodexPieces.Count; i++)
-        {
-            if (foundCodexPieces[i] == codexPiece)
-            {
-                Destroy(foundCodexPieces[i]);
-            }
-        }
-    }
     #endregion
 
     public void UpdateLastCheckpoint()
@@ -151,8 +137,9 @@ public class GameController : MonoBehaviour
     {
         startScreen.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
         .OnComplete(() => startScreen.gameObject.SetActive(false));
-       
+
         CharacterController.instance.Unpause();
+        HealthScript.instance.RestartRoutineDrainHealth();
     }
 
     public void QuitGame()

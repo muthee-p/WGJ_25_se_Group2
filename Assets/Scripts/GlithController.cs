@@ -6,8 +6,7 @@ public class GlitchController : MonoBehaviour
 {
     public static GlitchController instance;
     [SerializeField] private Material glitchMaterial;
-    public float noiseAmount, glitchStrength, scanLinesStrength;
-     void Awake()
+    void Awake()
     {
         if (instance == null)
         {
@@ -19,15 +18,24 @@ public class GlitchController : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     void Start()
     {
-        
+        SetNoise(0.1f);
+        SetGlitchStrength(0.1f);
+        SetScanLines(0.8f);
     }
 
-    public void GlitchOn()
+    public void SetNoise(float noiseAmount)
     {
-        glitchMaterial.SetFloat("NoiseAmount", noiseAmount);
-        glitchMaterial.SetFloat("GlitchStrength", glitchStrength);
-        glitchMaterial.SetFloat("ScanLinesStrength", scanLinesStrength);
+        glitchMaterial.SetFloat("_NoiseAmount", noiseAmount);
+    }
+    public void SetGlitchStrength( float glitchStrength)
+    {
+        glitchMaterial.SetFloat("_GlitchStrength", glitchStrength);
+    }
+    public void SetScanLines( float scanLinesStrength)
+    {
+        glitchMaterial.SetFloat("_ScanLinesStrength", scanLinesStrength);
     }
 }

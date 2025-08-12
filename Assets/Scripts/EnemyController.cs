@@ -10,8 +10,9 @@ public class EnemyController : MonoBehaviour
     public float attackZone;
     public Vector3 initialPos;
     public bool isAttacking = false;
+    public int maxHealth = 30;
+    public string uniqueId;
     private Transform player;
-    int maxHealth = 30;
     Animator anim;
 
     void Start()
@@ -19,11 +20,20 @@ public class EnemyController : MonoBehaviour
         anim = GetComponent<Animator>();
         initialPos = transform.position;
         player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        if (uniqueId == null)  uniqueId = gameObject.scene.name + "_" + gameObject.name + "_" + transform.position.ToString();
+
+        if (GameController.instance.killedEnemies.Contains(uniqueId))
+        {
+            Destroy(gameObject);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (CharacterController.instance.movement == CharacterController.Movement.Fainted || CharacterController.instance.gameState == CharacterController.GameState.Paused) return;
+
         float distanceFromPlayer = Vector2.Distance(player.position, transform.position);
         if (distanceFromPlayer < lineOfSight && distanceFromPlayer > attackZone)
         {
@@ -41,6 +51,7 @@ public class EnemyController : MonoBehaviour
             isAttacking = false;
         }
 
+        //face player
         if (player.position.x > transform.position.x)
         {
             transform.rotation = Quaternion.Euler(0, 180, 0);
@@ -50,10 +61,14 @@ public class EnemyController : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, 0, 0);
         }
 
+        //back to idle
         if (transform.position == initialPos)
         {
             anim.SetFloat("speed", 0);
         }
+
+        //captured player
+        if(CharacterCheckAttack.instance.beingAttacked == CharacterCheckAttack.BeingAttacked.Captured) anim.SetFloat("speed", 0);
 
     }
 
@@ -62,7 +77,7 @@ public class EnemyController : MonoBehaviour
         maxHealth -= damage;
         if (maxHealth <= 0)
         {
-            GameController.instance.AddDeadEnemy(gameObject);
+            GameController.instance.killedEnemies.Add(uniqueId);
             Destroy(gameObject);
         }
     }
