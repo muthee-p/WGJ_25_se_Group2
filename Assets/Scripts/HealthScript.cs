@@ -11,9 +11,8 @@ public class HealthScript : MonoBehaviour
     [SerializeField] private GameObject messagePanel, restartButton;
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private AudioClip healthLowWarning, faintingSound;
-    public float maxHealth, lowHealthThreshold;
+    public float maxHealth, lowHealthThreshold, currentHealth;
     float healthLoss = 10;
-    float currentHealth;
     bool messageShown = false;
     Coroutine coroutineDrainHealth;
     AudioSource audioSource;
@@ -52,6 +51,13 @@ public class HealthScript : MonoBehaviour
 
             healthBar.value = currentHealth;
 
+            if (currentHealth <= 3000)
+            {
+                GlitchController.instance.SetNoise(0.1f);
+                GlitchController.instance.SetGlitchStrength(0.1f);
+                GlitchController.instance.SetScanLines(0.8f);
+            }
+
             if (currentHealth <= lowHealthThreshold && !messageShown
                 && CharacterCheckAttack.instance.beingAttacked == CharacterCheckAttack.BeingAttacked.NotBeingAttacked)
             {
@@ -65,7 +71,7 @@ public class HealthScript : MonoBehaviour
 
             yield return new WaitForSeconds(0.2f);
         }
-        Debug.Log(CharacterCheckAttack.instance.beingAttacked);
+
         if (CharacterCheckAttack.instance.beingAttacked == CharacterCheckAttack.BeingAttacked.NotBeingAttacked)
         {
 
@@ -107,6 +113,14 @@ public class HealthScript : MonoBehaviour
         coroutineDrainHealth = StartCoroutine(DrainHealth());
     }
 
+    public void StopRoutineDrainHealth()
+    {
+        if (coroutineDrainHealth != null)
+        {
+            StopCoroutine(coroutineDrainHealth);
+        }
+    }
+
     void ChangeSprites()
     {
         SpriteChange[] spritesChange = FindObjectsOfType<SpriteChange>();
@@ -137,6 +151,11 @@ public class HealthScript : MonoBehaviour
         messagePanel.SetActive(false);
     }
 
+    public void StartShowMessage(string message, float duration)
+    {
+        StartCoroutine(ShowMessage(message, duration));
+    }
+
     #region Game States
     public void GameOver(string message)
     {
@@ -156,15 +175,6 @@ public class HealthScript : MonoBehaviour
 
         restartButton.SetActive(true);
 
-    }
-    public void YouWon(string message)
-    {
-        StopCoroutine(coroutineDrainHealth);
-        CharacterController.instance.Faint();
-        messageText.text = message;
-        messagePanel.SetActive(true);
-        messagePanel.transform.localScale = Vector3.zero;
-        messagePanel.transform.DOScale(messagePanelScale, 0.4f).SetEase(Ease.OutBack);
     }
 
 

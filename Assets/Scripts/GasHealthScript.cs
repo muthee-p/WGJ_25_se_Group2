@@ -30,9 +30,11 @@ public class GasHealthScript : MonoBehaviour
                     GlitchController.instance.SetGlitchStrength(11f);
                     GlitchController.instance.SetScanLines(0.4f);
                     break;
-                // case 3:
-                //     CharacterController.instance.ResetStates();
-                //     break;
+                case 3:
+                    GlitchController.instance.SetNoise(5f);
+                    GlitchController.instance.SetGlitchStrength(14f);
+                    GlitchController.instance.SetScanLines(0.3f);
+                    break;
             }
         }
     }

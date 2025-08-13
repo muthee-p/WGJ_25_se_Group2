@@ -54,9 +54,9 @@ Material:
     m_Ints: []
     m_Floats:
     - _EnableExternalAlpha: 0
-    - _GlitchStrength: 3
-    - _NoiseAmount: 1
-    - _ScanLinesStrength: 0.5
+    - _GlitchStrength: 0.1
+    - _NoiseAmount: 0.1
+    - _ScanLinesStrength: 0.8
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}

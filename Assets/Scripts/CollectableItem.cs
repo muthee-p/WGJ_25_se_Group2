@@ -65,7 +65,9 @@ public class CollectableItem : MonoBehaviour
         switch (gameObject.tag)
         {
             case "Codex":
-                GameController.instance.ShowCodexPiece(codexText, researchLogText);
+                GameController.instance.ShowCodexPiece(codexText, researchLogText, true);
+                GameController.instance.AddCodexMessage(codexText);
+                GameController.instance.AddCodexTitle(researchLogText);
                 break;
             case "Weapon":
                 CharacterController.instance.weapon = CharacterController.Weapon.Armed;

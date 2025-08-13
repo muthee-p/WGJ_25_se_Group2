@@ -202,6 +202,7 @@ public class CharacterController : MonoBehaviour
         isAttacking = true;
         AudioSource.PlayClipAtPoint(attackSound, transform.position, 0.5f);
         weaponHitbox.SetActive(true);
+        weaponHitbox.GetComponent<Animation>().Play();
         yield return new WaitForSeconds(0.5f);
         weaponHitbox.SetActive(false);
         isAttacking = false;

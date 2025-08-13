@@ -1,10 +1,17 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneTransition : MonoBehaviour
 {
     public int sceneNumber;
+    GameObject fadeinPanel;
     bool canChangeScene = false;
+
+    void Start()
+    {
+        fadeinPanel = GameObject.Find("FadeInPanel");
+    }
 
     void Update()
     {
@@ -38,5 +45,6 @@ public class SceneTransition : MonoBehaviour
     void EnterLevel()
     {
         SceneManager.LoadScene(sceneNumber);
+        fadeinPanel.GetComponent<CanvasGroup>().alpha = 1f;
     }
 }
