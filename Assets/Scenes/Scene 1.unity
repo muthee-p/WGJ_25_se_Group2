@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 752068500575695573, guid: 9520ddd2f31a2484da3a67787870abe8, type: 3}
       propertyPath: damage
-      value: 200
+      value: 130
       objectReference: {fileID: 0}
     - target: {fileID: 6078828289334014081, guid: 9520ddd2f31a2484da3a67787870abe8, type: 3}
       propertyPath: uniqueId
@@ -310,6 +310,7 @@ GameObject:
   - component: {fileID: 307805740}
   - component: {fileID: 307805742}
   - component: {fileID: 307805741}
+  - component: {fileID: 307805743}
   m_Layer: 0
   m_Name: Virtual Camera
   m_TagString: VirtualCamera
@@ -389,6 +390,18 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_ComponentOwner: {fileID: 2020350797}
+--- !u!114 &307805743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 307805739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e953a4ce0d9e9d047b55b6a302c45294, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &397592135
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,7 +703,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 752068500575695573, guid: 9520ddd2f31a2484da3a67787870abe8, type: 3}
       propertyPath: damage
-      value: 300
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 1118480161225254117, guid: 9520ddd2f31a2484da3a67787870abe8, type: 3}
       propertyPath: m_LocalScale.x
@@ -56090,10 +56103,12 @@ MonoBehaviour:
   pauseScreen: {fileID: 0}
   settingsPanel: {fileID: 0}
   credisPanel: {fileID: 0}
+  gameWonScreen: {fileID: 0}
   codexText: {fileID: 0}
   researchLogText: {fileID: 0}
   normalFont: {fileID: 0}
   distortedFont: {fileID: 0}
+  musicToggle: {fileID: 0}
   codexMessages: []
   codexTitles: []
   enemyTutotialShown: 0
@@ -56828,6 +56843,7 @@ GameObject:
   - component: {fileID: 2020350797}
   - component: {fileID: 2020350799}
   - component: {fileID: 2020350798}
+  - component: {fileID: 2020350800}
   m_Layer: 0
   m_Name: cm
   m_TagString: Untagged
@@ -56905,6 +56921,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2020350800
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020350796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
+  m_PivotOffset: {x: 0, y: 0, z: 0}
+  m_AmplitudeGain: 1
+  m_FrequencyGain: 0
+  mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!4 &2138660758 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8703449527501932982, guid: bf3e8de1527add84bb74994521a51554, type: 3}
@@ -56970,7 +57003,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 752068500575695573, guid: 9520ddd2f31a2484da3a67787870abe8, type: 3}
       propertyPath: damage
-      value: 250
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 1118480161225254117, guid: 9520ddd2f31a2484da3a67787870abe8, type: 3}
       propertyPath: m_LocalScale.x

@@ -76,12 +76,17 @@ public class CharacterController : MonoBehaviour
         {
             if (Mathf.Abs(moveInput) > 0.01f)
             {
-                anim.SetFloat("speed", 0.5f);
                 if (!audioSource.isPlaying) audioSource.Play();
                 if (Input.GetKey(KeyCode.LeftShift))
+                {
                     movement = Movement.Running;
+                    anim.SetFloat("speed", 1f);
+                }
                 else
+                {
+                    anim.SetFloat("speed", 0.5f);
                     movement = Movement.Walking;
+                }
             }
             else
             {
@@ -111,9 +116,11 @@ public class CharacterController : MonoBehaviour
         {
             case Weapon.Armed:
                 weaponHitbox.SetActive(true);
+                anim.SetBool("Armed", true);
                 break;
             case Weapon.Unarmed:
                 weaponHitbox.SetActive(false);
+                anim.SetBool("Armed", false);
                 break;
         }
 
@@ -200,12 +207,13 @@ public class CharacterController : MonoBehaviour
         if (isAttacking) yield break;
 
         isAttacking = true;
+        anim.SetBool("Attacking", true);
         AudioSource.PlayClipAtPoint(attackSound, transform.position, 0.5f);
         weaponHitbox.SetActive(true);
-        weaponHitbox.GetComponent<Animation>().Play();
         yield return new WaitForSeconds(0.5f);
         weaponHitbox.SetActive(false);
         isAttacking = false;
+        anim.SetBool("Attacking", false);
     }
     #endregion
 

@@ -9,6 +9,13 @@ public class EnemyClose : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
     }
+    void Update()
+    {
+        if (CharacterCheckAttack.instance.beingAttacked == CharacterCheckAttack.BeingAttacked.Captured && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+    }
 
     void OnTriggerEnter2D(Collider2D col)
     {

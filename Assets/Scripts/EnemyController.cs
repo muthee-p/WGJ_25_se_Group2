@@ -1,12 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] private Slider healthBar;
-    public float speed = 7;
+    public float walkSpeed = 7, runSpeed = 15;
     public float lineOfSight;
     public float attackZone;
     public float gasAvoidRange;
@@ -14,9 +16,15 @@ public class EnemyController : MonoBehaviour
     public bool isAttacking = false;
     public int maxHealth = 30;
     public string uniqueId;
+    public float attackWindup = 0.5f;
+    public float attackRecovery = 0.2f;
     private Transform player, gas;
+    float speed;
     Animator anim;
     Coroutine attackCoroutine;
+    float attackCooldown = 2;
+    float lastAttackTime;
+    bool facingRight = false;
 
     void Start()
     {
@@ -27,8 +35,9 @@ public class EnemyController : MonoBehaviour
         initialPos = transform.position;
         player = GameObject.FindGameObjectWithTag("Player").transform;
         gas = GameObject.FindGameObjectWithTag("Checkpoint").transform;
+        speed = 0;
 
-        if (uniqueId == null)  uniqueId = gameObject.scene.name + "_" + gameObject.name + "_" + transform.position.ToString();
+        if (uniqueId == null) uniqueId = gameObject.scene.name + "_" + gameObject.name + "_" + transform.position.ToString();
 
         if (GameController.instance.killedEnemies.Contains(uniqueId))
         {
@@ -44,55 +53,94 @@ public class EnemyController : MonoBehaviour
         float distanceFromPlayer = Vector2.Distance(player.position, transform.position);
         float distanceFromGas = Vector2.Distance(gas.position, transform.position);
 
-        if (distanceFromGas < gasAvoidRange) // <-- set gasAvoidRange in inspector
+        if (distanceFromGas < gasAvoidRange)
         {
-            StopCoroutine(attackCoroutine);
+            StopAttack();
             anim.SetFloat("speed", 0.5f);
-            transform.position = new Vector3(
-                Mathf.MoveTowards(transform.position.x, initialPos.x, speed * Time.deltaTime),
-                transform.position.y,
-                transform.position.z
-            );
-            isAttacking = false;
+            Vector3 targetPos = new Vector3(initialPos.x, transform.position.y, transform.position.z);
+            transform.position = Vector2.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
             return;
-        }
+        }else if (distanceFromPlayer > lineOfSight) ReturnToInitialPos();
 
-        if (distanceFromPlayer < lineOfSight && distanceFromPlayer > attackZone)
+        if (distanceFromPlayer < lineOfSight)
         {
-            anim.SetFloat("speed", 0.8f);
-            transform.position = new Vector3(Mathf.MoveTowards(transform.position.x, player.position.x, speed * Time.deltaTime), transform.position.y, transform.position.z);
-        }
-        else if (distanceFromPlayer < attackZone && !isAttacking)
-        {
-            isAttacking = true;
-            attackCoroutine = StartCoroutine(AttackRoutine());
+            FacePlayer();
+            if (distanceFromPlayer > attackZone)
+            {
+               ChasePlayer();
+            }
+            else if (!isAttacking && Time.time >= lastAttackTime + attackCooldown)
+            {
+                StartAttack();
+            }
         }
         else
         {
-            anim.SetFloat("speed", 0.5f);
-            transform.position = new Vector3(Mathf.MoveTowards(transform.position.x, initialPos.x, speed * Time.deltaTime), transform.position.y, transform.position.z);
-            isAttacking = false;
+            ReturnToInitialPos();
         }
 
-        //face player
-        if (player.position.x > transform.position.x)
-        {
-            transform.rotation = Quaternion.Euler(0, 180, 0);
-        }
-        else
-        {
-            transform.rotation = Quaternion.Euler(0, 0, 0);
-        }
-
-        //back to idle
         if (transform.position == initialPos)
         {
             anim.SetFloat("speed", 0);
+            speed = 0;
         }
 
         //captured player
-        if(CharacterCheckAttack.instance.beingAttacked == CharacterCheckAttack.BeingAttacked.Captured) anim.SetFloat("speed", 0);
+        if (CharacterCheckAttack.instance.beingAttacked == CharacterCheckAttack.BeingAttacked.Captured) anim.SetFloat("speed", 0);
 
+    }
+
+    void FacePlayer()
+    {
+        float diff = player.position.x - transform.position.x;
+
+       if (Mathf.Abs(diff) > 0.1f)
+        {
+            bool faceRight = diff > 0;
+            if (faceRight != facingRight)
+            {
+                facingRight = faceRight;
+                transform.rotation = facingRight ? Quaternion.Euler(0, 180, 0) : Quaternion.Euler(0, 0, 0);
+            }
+        }
+    }
+
+    void ChasePlayer()
+    {
+        if(isAttacking) return;
+
+        anim.SetFloat("speed", 0.8f);
+        speed = runSpeed;
+
+        Vector3 targetPos = new Vector3(player.position.x, transform.position.y, transform.position.z);
+        transform.position = Vector2.MoveTowards(transform.position, targetPos , speed * Time.deltaTime);
+    }
+
+    void StartAttack()
+    {
+        //anim.SetTrigger("Attack");
+        isAttacking = true;
+        lastAttackTime = Time.time;
+        speed = runSpeed;
+        attackCoroutine = StartCoroutine(AttackRoutine());
+    }
+    void StopAttack()
+    {
+        if (attackCoroutine != null) StopCoroutine(attackCoroutine);
+        isAttacking = false;
+        anim.SetFloat("speed", 0.5f);
+        speed = walkSpeed;
+    }
+
+    void ReturnToInitialPos()
+    {
+        if(isAttacking) return;
+
+        anim.SetFloat("speed", 0.5f);
+        speed = walkSpeed;
+
+        Vector3 targetPos = new Vector3(initialPos.x, transform.position.y, transform.position.z);
+        transform.position = Vector2.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
     }
 
     public void TakeDamage(int damage)
@@ -107,23 +155,34 @@ public class EnemyController : MonoBehaviour
     }
     private IEnumerator AttackRoutine()
     {
-        yield return new WaitForSeconds(.8f);
-
-        Vector2 targetPos = player.position;
-        float lungeSpeed = speed * 0.4f;
-        float lungeTime = 0.2f;
+        transform.GetChild(0).gameObject.SetActive(true);
+        anim.SetFloat("speed", 0);
+        yield return new WaitForSeconds(attackWindup);
+        
+        float lungeSpeed = speed * 2f;
+        //float lungeTime = 0.2f;
         float elapsedTime = 0;
-        while (elapsedTime < lungeTime)
+
+        Vector3 attackPos = new Vector3(player.position.x, transform.position.y, transform.position.z);
+
+        while (Vector3.Distance(transform.position, attackPos) > 0.1f)
         {
-            transform.GetChild(0).gameObject.SetActive(true);
-            transform.position = Vector2.MoveTowards(transform.position, targetPos, lungeSpeed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(transform.position, attackPos, lungeSpeed * Time.deltaTime);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+        // while (elapsedTime < lungeTime)
+        // {
+        //     float progress = elapsedTime / lungeTime;
+        //     transform.position = Vector2.Lerp(startPos, attackPos, progress); 
+        //     elapsedTime += Time.deltaTime;
+        //     yield return null;
+        // }
 
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(attackRecovery);
         transform.GetChild(0).gameObject.SetActive(false);
         isAttacking = false;
+        attackCoroutine = null;
     }
 
     private void OnDrawGizmosSelected()

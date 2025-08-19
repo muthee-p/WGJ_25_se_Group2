@@ -32,7 +32,7 @@ public class CollectableItem : MonoBehaviour
             {
                 AudioSource.PlayClipAtPoint(collectedSound, transform.position);
                 MatchCollectedItem();
-                GameController.instance.foundCodexPieces.Add(uniqueId);
+                
                 Destroy(gameObject);
             }
         }
@@ -68,6 +68,7 @@ public class CollectableItem : MonoBehaviour
                 GameController.instance.ShowCodexPiece(codexText, researchLogText, true);
                 GameController.instance.AddCodexMessage(codexText);
                 GameController.instance.AddCodexTitle(researchLogText);
+                GameController.instance.foundCodexPieces.Add(uniqueId);
                 break;
             case "Weapon":
                 CharacterController.instance.weapon = CharacterController.Weapon.Armed;

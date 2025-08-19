@@ -13,5 +13,12 @@ public class EnemyHitbox : MonoBehaviour
             HealthScript.instance.TakeDamage(damage);
         }
     }
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            HealthScript.instance.TakeDamage(damage);
+        }
+    }
 }
 

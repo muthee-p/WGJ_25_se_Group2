@@ -9,6 +9,7 @@ public class HealthScript : MonoBehaviour
     public static HealthScript instance;
     [SerializeField] private Slider healthBar;
     [SerializeField] private GameObject messagePanel, restartButton;
+    [SerializeField] private Image bloodyOverlay;
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private AudioClip healthLowWarning, faintingSound;
     public float maxHealth, lowHealthThreshold, currentHealth;
@@ -41,7 +42,6 @@ public class HealthScript : MonoBehaviour
 
         audioSource = GetComponent<AudioSource>();
     }
-
     IEnumerator DrainHealth()
     {
         while (currentHealth > 0)
@@ -89,12 +89,27 @@ public class HealthScript : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         healthBar.value = currentHealth;
+        GameObject.Find("Virtual Camera").GetComponent<CameraShake>().SetNoise(1f, 0.5f);
+        
+        bloodyOverlay.DOFade(1f, 0.1f).OnComplete(() => bloodyOverlay.DOFade(0.35f, 0.1f));
+        //StartCoroutine(HitStop());
+    }
+
+    IEnumerator HitStop()
+    {
+        Time.timeScale = 0f;
+        yield return new WaitForSecondsRealtime(0.1f);
+        Time.timeScale = 1f;
     }
 
     public void RefillHealth()
     {
         if (audioSource.isPlaying) audioSource.Stop();
         audioSource.clip = null;
+
+        Color color = bloodyOverlay.color;
+        color.a = 0;
+        bloodyOverlay.color = color;
 
         ChangeSpritesBack();
         currentHealth = maxHealth;
@@ -174,7 +189,7 @@ public class HealthScript : MonoBehaviour
         messagePanel.transform.DOScale(messagePanelScale, 0.4f).SetEase(Ease.OutBack);
 
         restartButton.SetActive(true);
-
+        bloodyOverlay.DOFade(0f, 0.1f);
     }
 
 
@@ -190,6 +205,7 @@ public class HealthScript : MonoBehaviour
         restartButton.SetActive(false);
         messagePanel.transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack)
         .OnComplete(() => messagePanel.gameObject.SetActive(false));
+        bloodyOverlay.DOFade(0f, 0.1f);
     }
     
     #endregion
