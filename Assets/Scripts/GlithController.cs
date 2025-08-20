@@ -6,6 +6,7 @@ public class GlitchController : MonoBehaviour
 {
     public static GlitchController instance;
     [SerializeField] private Material glitchMaterial;
+    public bool setToMax = false;
     void Awake()
     {
         if (instance == null)

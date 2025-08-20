@@ -118,7 +118,6 @@ public class EnemyController : MonoBehaviour
 
     void StartAttack()
     {
-        //anim.SetTrigger("Attack");
         isAttacking = true;
         lastAttackTime = Time.time;
         speed = runSpeed;
@@ -155,10 +154,10 @@ public class EnemyController : MonoBehaviour
     }
     private IEnumerator AttackRoutine()
     {
-        transform.GetChild(0).gameObject.SetActive(true);
         anim.SetFloat("speed", 0);
         yield return new WaitForSeconds(attackWindup);
-        
+        anim.SetBool("Attacking", true);
+
         float lungeSpeed = speed * 2f;
         //float lungeTime = 0.2f;
         float elapsedTime = 0;
@@ -169,6 +168,7 @@ public class EnemyController : MonoBehaviour
         {
             transform.position = Vector2.MoveTowards(transform.position, attackPos, lungeSpeed * Time.deltaTime);
             elapsedTime += Time.deltaTime;
+
             yield return null;
         }
         // while (elapsedTime < lungeTime)
@@ -180,10 +180,31 @@ public class EnemyController : MonoBehaviour
         // }
 
         yield return new WaitForSeconds(attackRecovery);
-        transform.GetChild(0).gameObject.SetActive(false);
         isAttacking = false;
+        anim.SetBool("Attacking", false);
         attackCoroutine = null;
     }
+
+    public void ApplyKnockback(Vector2 sourcePos, float force, float duration)
+    {
+        StartCoroutine(KnockbackRoutine(sourcePos, force, duration));
+    }
+
+    private IEnumerator KnockbackRoutine(Vector2 sourcePos, float force, float duration)
+    {
+        // direction only on X axis
+        float dir = (transform.position.x - sourcePos.x) > 0 ? 1f : -1f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            transform.position += new Vector3(dir * force * Time.deltaTime, 0f, 0f);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+
 
     private void OnDrawGizmosSelected()
     {

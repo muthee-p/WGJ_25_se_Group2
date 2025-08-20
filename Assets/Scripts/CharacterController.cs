@@ -1,3 +1,4 @@
+using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 
@@ -189,7 +190,7 @@ public class CharacterController : MonoBehaviour
     {
         gameState = GameState.Playing;
     }
-    
+
     public void Pause()
     {
         gameState = GameState.Paused;
@@ -202,7 +203,7 @@ public class CharacterController : MonoBehaviour
         StartCoroutine(AttackRoutine());
     }
 
-    private System.Collections.IEnumerator AttackRoutine()
+    IEnumerator AttackRoutine()
     {
         if (isAttacking) yield break;
 
@@ -215,6 +216,23 @@ public class CharacterController : MonoBehaviour
         isAttacking = false;
         anim.SetBool("Attacking", false);
     }
+    // --- Knockback ---
+    public void ApplyKnockback( float force, float duration)
+    {
+        Vector2 dir = (transform.localScale.x > 0) ? Vector2.right : Vector2.left;
+        if (rb != null)
+        {
+            rb.velocity = new Vector2(dir.x * force, rb.velocity.y);
+            StartCoroutine(ResetVelocityAfter(duration, rb));
+        }
+    }
+
+    IEnumerator ResetVelocityAfter(float time, Rigidbody2D rb)
+    {
+        yield return new WaitForSeconds(time);
+        rb.velocity = new Vector2(0, rb.velocity.y);
+    }
+
     #endregion
 
 }

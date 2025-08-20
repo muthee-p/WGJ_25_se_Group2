@@ -226,6 +226,7 @@ public void CancleButton()
         GlitchController.instance.SetNoise(0.1f);
         GlitchController.instance.SetGlitchStrength(0.1f);
         GlitchController.instance.SetScanLines(0.8f);
+        GlitchController.instance.setToMax = false;
     }
 
     public void StartGame()

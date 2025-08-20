@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 6078828289334014081}
   - component: {fileID: 6415232220674854774}
   - component: {fileID: 1634043436598296309}
-  m_Layer: 0
+  - component: {fileID: 4393197192463805012}
+  m_Layer: 3
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -103,7 +104,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthBar: {fileID: 2189814006149480875}
-  speed: 7
+  walkSpeed: 7
+  runSpeed: 15
   lineOfSight: 10
   attackZone: 3
   gasAvoidRange: 17.8
@@ -111,6 +113,8 @@ MonoBehaviour:
   isAttacking: 0
   maxHealth: 10
   uniqueId: enemy1
+  attackWindup: 0.5
+  attackRecovery: 0.2
 --- !u!61 &6415232220674854774
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -140,7 +144,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: -0.4465294, y: 0}
@@ -177,6 +181,33 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!50 &4393197192463805012
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 16120454843301757}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 0.0001
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
 --- !u!1 &155038813727124908
 GameObject:
   m_ObjectHideFlags: 0
@@ -189,7 +220,7 @@ GameObject:
   - component: {fileID: 3180660610598504156}
   - component: {fileID: 4656406334292167672}
   - component: {fileID: 6810229455318207857}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -290,7 +321,7 @@ GameObject:
   - component: {fileID: 1393738771012087711}
   - component: {fileID: 1709617165990133157}
   - component: {fileID: 524925595665158125}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -363,7 +394,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9059406344178011375}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -408,7 +439,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4432829534612108918
 Transform:
   m_ObjectHideFlags: 0
@@ -418,8 +449,8 @@ Transform:
   m_GameObject: {fileID: 2255360229797722983}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.7679, y: -0.0131, z: 0}
-  m_LocalScale: {x: 2.2041762, y: 2.8972828, z: 1}
+  m_LocalPosition: {x: -0.93, y: -0.006, z: 0}
+  m_LocalScale: {x: 1.186508, y: 0.9901637, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8927141871576963372}
@@ -547,7 +578,7 @@ GameObject:
   - component: {fileID: 3554881592620376890}
   - component: {fileID: 5586488619228588057}
   - component: {fileID: 6996786381152296761}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: EnemyCloseSound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -785,7 +816,7 @@ GameObject:
   - component: {fileID: 1312451208354456630}
   - component: {fileID: 6189565201193510727}
   - component: {fileID: 2255044334974934868}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -859,7 +890,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7857664298836348845}
   - component: {fileID: 2189814006149480875}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}

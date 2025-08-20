@@ -15,6 +15,8 @@ public class WeaponHitbox : MonoBehaviour
             if (enemyHealth != null)
             {
                 enemyHealth.TakeDamage(damage);
+                //Vector2 knockDir = (5f * (other.transform.position - transform.position)).normalized;
+                enemyHealth.ApplyKnockback(owner.transform.position, 15f, 0.3f);
             }
         }
     }

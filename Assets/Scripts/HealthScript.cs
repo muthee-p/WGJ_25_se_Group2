@@ -91,7 +91,7 @@ public class HealthScript : MonoBehaviour
         healthBar.value = currentHealth;
         GameObject.Find("Virtual Camera").GetComponent<CameraShake>().SetNoise(1f, 0.5f);
         
-        bloodyOverlay.DOFade(1f, 0.1f).OnComplete(() => bloodyOverlay.DOFade(0.35f, 0.1f));
+        bloodyOverlay.DOFade(1f, 0.1f).OnComplete(() => bloodyOverlay.DOFade(0.25f, 0.1f));
         //StartCoroutine(HitStop());
     }
 
