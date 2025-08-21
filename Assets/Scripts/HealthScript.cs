@@ -13,7 +13,7 @@ public class HealthScript : MonoBehaviour
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private AudioClip healthLowWarning, faintingSound;
     public float maxHealth, lowHealthThreshold, currentHealth;
-    float healthLoss = 10;
+    public float healthLoss = 50;
     bool messageShown = false;
     Coroutine coroutineDrainHealth;
     AudioSource audioSource;
@@ -89,7 +89,8 @@ public class HealthScript : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         healthBar.value = currentHealth;
-        GameObject.Find("Virtual Camera").GetComponent<CameraShake>().SetNoise(1f, 0.5f);
+        GameObject vc = GameObject.Find("Virtual Camera");
+        if (vc != null) vc.GetComponent<CameraShake>().SetNoise(1f, 0.5f);
         
         bloodyOverlay.DOFade(1f, 0.1f).OnComplete(() => bloodyOverlay.DOFade(0.25f, 0.1f));
         //StartCoroutine(HitStop());

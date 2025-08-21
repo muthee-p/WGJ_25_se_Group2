@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,6 +9,7 @@ public class GasHealthScript : MonoBehaviour
         {
             HealthScript.instance.RefillHealth();
             GameController.instance.UpdateLastCheckpoint();
+            HealthScript.instance.StopRoutineDrainHealth();
 
             if (!GlitchController.instance.setToMax)
             {

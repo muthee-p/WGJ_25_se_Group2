@@ -13,7 +13,7 @@ public class EnemyController : MonoBehaviour
     public float attackZone;
     public float gasAvoidRange;
     public Vector3 initialPos;
-    public bool isAttacking = false;
+    public bool isAttacking = false, isPushedBack = false;
     public int maxHealth = 30;
     public string uniqueId;
     public float attackWindup = 0.5f;
@@ -107,7 +107,7 @@ public class EnemyController : MonoBehaviour
 
     void ChasePlayer()
     {
-        if(isAttacking) return;
+        if(isAttacking || isPushedBack) return;
 
         anim.SetFloat("speed", 0.8f);
         speed = runSpeed;
@@ -146,6 +146,9 @@ public class EnemyController : MonoBehaviour
     {
         maxHealth -= damage;
         healthBar.value = maxHealth;
+        GameObject vc = GameObject.Find("Virtual Camera");
+        if (vc != null) vc.GetComponent<CameraShake>().SetNoise(1f, 0.5f);
+        
         if (maxHealth <= 0)
         {
             GameController.instance.killedEnemies.Add(uniqueId);
@@ -202,6 +205,8 @@ public class EnemyController : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
+
+        isPushedBack = false;
     }
 
 

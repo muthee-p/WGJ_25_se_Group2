@@ -29,13 +29,13 @@ public class SceneChangeListener : MonoBehaviour
         switch (SceneManager.GetActiveScene().buildIndex)
         {
             case 0:
-                sceneNameText.text = "Main Lab";
+                sceneNameText.text = "Lab 03-X";
                 break;
             case 1:
                 sceneNameText.text = "Main Lobby";
                 break;
             case 2:
-                sceneNameText.text = "Specimen Quarantine";
+                sceneNameText.text = "Subjects Quarantine";
                 break;
             case 3:
                 sceneNameText.text = "Biohazard Containment";
